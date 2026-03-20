@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 1: Celebrity Drama Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #050505; color: #ffffff; overflow-x: hidden; }
+        .font-bungee { font-family: 'Bungee', cursive; }
+        .glass { background: rgba(20, 20, 20, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .tab-active { color: #ff007f; border-bottom: 4px solid #ff007f; }
+        
+        .verb-btn { transition: all 0.2s ease; cursor: pointer; border-bottom: 3px solid rgba(255,255,255,0.2); }
+        .verb-btn:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
+        .correct-imp { background: #3b82f6 !important; color: white !important; border-color: #2563eb !important; box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
+        .correct-pret { background: #ec4899 !important; color: white !important; border-color: #db2777 !important; box-shadow: 0 0 15px rgba(236, 72, 153, 0.5); }
+        
+        .bank-item { transition: all 0.2s; cursor: pointer; position: relative; }
+        .bank-item:hover { transform: scale(1.02); filter: brightness(1.2); }
+        .bank-item::after { content: '?'; position: absolute; right: 8px; top: 50%; transform: translateY(-50%); opacity: 0.5; font-size: 10px; }
+
+        .new-post { animation: slideIn 0.5s ease-out; }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-10">
+
+    <header class="p-6 flex flex-col md:flex-row justify-between items-center gap-4 glass sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <div class="bg-yellow-400 text-black px-3 py-1 font-black text-xl italic skew-x-[-10deg]">¡ESCÁNDALO!</div>
+            <h1 class="font-bungee text-2xl tracking-widest text-white">CELEBRITY DRAMA</h1>
+        </div>
+        <nav class="flex gap-6 font-black uppercase text-xs tracking-tighter">
+            <button onclick="showTab('generator')" id="btn-generator" class="tab-active py-2">1. Grammar Lab</button>
+            <button onclick="showTab('rumors')" id="btn-rumors" class="py-2">2. Rumor Mill</button>
+            <button onclick="showTab('fanmail')" id="btn-fanmail" class="py-2">3. Fan Mail</button>
+        </nav>
+    </header>
+
+    <main class="max-w-6xl mx-auto mt-8 px-4">
+
+        <!-- TAB 1: INTERACTIVE GRAMMAR LAB -->
+        <section id="tab-generator" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-1 space-y-6">
+                    <div class="glass p-6 rounded-2xl border-l-4 border-yellow-400">
+                        <h2 class="text-yellow-400 font-black text-xl mb-4 italic underline">THE MISSION:</h2>
+                        <p class="text-sm leading-relaxed mb-4">Identify the verbs to verify the source.</p>
+                        <div class="space-y-3">
+                            <div class="flex items-start gap-3 p-3 bg-blue-900/20 rounded-lg">
+                                <span class="w-4 h-4 mt-1 rounded-full bg-blue-500 shrink-0"></span>
+                                <p class="text-xs"><b>IMPERFECTO:</b> Background / "Was -ing"</p>
+                            </div>
+                            <div class="flex items-start gap-3 p-3 bg-pink-900/20 rounded-lg">
+                                <span class="w-4 h-4 mt-1 rounded-full bg-pink-500 shrink-0"></span>
+                                <p class="text-xs"><b>PRETÉRITO:</b> Interruption / "Happened"</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="generateDrama()" class="w-full bg-gradient-to-r from-pink-600 to-purple-600 py-6 rounded-2xl font-bungee text-2xl hover:brightness-125 transition-all shadow-lg shadow-pink-500/40">
+                        NEW SCANDAL
+                    </button>
+                    <div id="feedback-box" class="hidden glass p-4 rounded-xl text-center font-bold text-sm"></div>
+                </div>
+
+                <div class="lg:col-span-2">
+                    <div id="drama-display" class="glass p-10 rounded-[3rem] text-center min-h-[400px] flex flex-col justify-center items-center border-2 border-slate-700">
+                        <div id="instruction-text" class="text-slate-500 uppercase tracking-widest text-sm mb-6">Click "New Scandal" to start</div>
+                        <div id="sentence-container" class="text-2xl md:text-4xl font-black mb-8 leading-relaxed"></div>
+                        <div id="controls" class="hidden flex flex-wrap justify-center gap-4">
+                            <button onclick="checkType('imp')" class="bg-blue-600 px-8 py-3 rounded-xl font-bold text-sm hover:bg-blue-500 transition-all uppercase tracking-widest">It's Imperfecto</button>
+                            <button onclick="checkType('pret')" class="bg-pink-600 px-8 py-3 rounded-xl font-bold text-sm hover:bg-pink-500 transition-all uppercase tracking-widest">It's Pretérito</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: RUMOR MILL -->
+        <section id="tab-rumors" class="tab-content hidden">
+            <div class="text-center mb-8">
+                <h2 class="font-bungee text-4xl text-blue-400">THE RUMOR MILL</h2>
+                <p class="text-slate-400 italic">Mix and match to create headlines</p>
+            </div>
+            <div class="glass p-6 rounded-3xl border border-slate-800 grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-slate-500 uppercase">1. Choose Star</label>
+                    <select id="sel-celeb" class="w-full bg-slate-900 p-3 rounded-xl border border-slate-700 text-white font-bold outline-none focus:border-blue-500">
+                        <option value="Bad Bunny">Bad Bunny</option>
+                        <option value="Rosalía">Rosalía</option>
+                        <option value="Messi">Lionel Messi</option>
+                        <option value="Shakira">Shakira</option>
+                        <option value="Karol G">Karol G</option>
+                        <option value="Peso Pluma">Peso Pluma</option>
+                        <option value="Selena Gomez">Selena Gomez</option>
+                        <option value="Rauw Alejandro">Rauw Alejandro</option>
+                    </select>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-slate-500 uppercase">2. Background (Imp)</label>
+                    <select id="sel-imp" class="w-full bg-slate-900 p-3 rounded-xl border border-slate-700 text-blue-400 font-bold outline-none focus:border-blue-500">
+                        <option value="caminaba">caminaba</option>
+                        <option value="comía">comía</option>
+                        <option value="bailaba">bailaba</option>
+                        <option value="dormía">dormía</option>
+                        <option value="cantaba">cantaba</option>
+                        <option value="lloraba">lloraba</option>
+                        <option value="hacía ejercicio">hacía ejercicio</option>
+                        <option value="miraba el cielo">miraba el cielo</option>
+                    </select>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-slate-500 uppercase">3. Interruption (Pret)</label>
+                    <select id="sel-pret" class="w-full bg-slate-900 p-3 rounded-xl border border-slate-700 text-pink-500 font-bold outline-none focus:border-pink-500">
+                        <option value="se cayó">se cayó</option>
+                        <option value="gritó">gritó</option>
+                        <option value="vio un fantasma">vio un fantasma</option>
+                        <option value="perdió su diamante">perdió su diamante</option>
+                        <option value="encontró un tesoro">encontró un tesoro</option>
+                        <option value="rompió su teléfono">rompió su teléfono</option>
+                        <option value="recibió un mensaje">recibió un mensaje</option>
+                        <option value="estornudó">estornudó</option>
+                    </select>
+                </div>
+                <button onclick="postRumor()" class="bg-white text-black font-black py-3 rounded-xl hover:bg-yellow-400 transition-all">POST RUMOR</button>
+            </div>
+            <div id="rumor-feed" class="mt-10 space-y-6 max-w-2xl mx-auto"></div>
+        </section>
+
+        <!-- TAB 3: FAN MAIL WITH SMART VERB BANKS -->
+        <section id="tab-fanmail" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                
+                <!-- Left Bank: Imperfecto -->
+                <div class="lg:col-span-1 space-y-4">
+                    <h3 class="font-bungee text-blue-400 text-sm text-center">Imperfecto Bank<br><span class="text-[10px] text-slate-500 tracking-normal">(Background)</span></h3>
+                    <div class="grid grid-cols-1 gap-2">
+                        <button onclick="getVerbIntel('imp', 'Estar', 'Regular', '')" class="bank-item bg-blue-900/30 border border-blue-500/30 p-3 rounded-xl text-xs font-bold text-blue-200 text-left">Estar</button>
+                        <button onclick="getVerbIntel('imp', 'Ser', 'Irregular', 'Uses a special stem: ER-')" class="bank-item bg-blue-900/30 border border-blue-500/30 p-3 rounded-xl text-xs font-bold text-blue-200 text-left">Ser</button>
+                        <button onclick="getVerbIntel('imp', 'Ir', 'Irregular', 'Uses a special stem: IB-')" class="bank-item bg-blue-900/30 border border-blue-500/30 p-3 rounded-xl text-xs font-bold text-blue-200 text-left">Ir</button>
+                        <button onclick="getVerbIntel('imp', 'Hacer', 'Regular', '')" class="bank-item bg-blue-900/30 border border-blue-500/30 p-3 rounded-xl text-xs font-bold text-blue-200 text-left">Hacer</button>
+                        <button onclick="getVerbIntel('imp', 'Ver', 'Irregular', 'Keep the E: VE-')" class="bank-item bg-blue-900/30 border border-blue-500/30 p-3 rounded-xl text-xs font-bold text-blue-200 text-left">Ver</button>
+                        <button onclick="getVerbIntel('imp', 'Cantar', 'Regular', '')" class="bank-item bg-blue-900/30 border border-blue-500/30 p-3 rounded-xl text-xs font-bold text-blue-200 text-left">Cantar</button>
+                    </div>
+                </div>
+
+                <!-- Center: Writing Area -->
+                <div class="lg:col-span-2 space-y-4">
+                    <div class="glass p-6 rounded-3xl border border-pink-500/20">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="font-bungee text-2xl text-pink-500">PRIVATE DM</h2>
+                            <span class="bg-green-500/20 text-green-400 px-2 py-1 rounded-md text-[10px] font-bold">● ACTIVE</span>
+                        </div>
+                        
+                        <!-- SMART FEEDBACK PANEL -->
+                        <div id="intel-panel" class="hidden mb-4 p-4 bg-slate-900/80 border-2 border-yellow-500/30 rounded-2xl">
+                            <div class="flex justify-between items-start mb-1">
+                                <span id="intel-verb" class="font-black text-lg text-yellow-400 uppercase italic">ESTAR</span>
+                                <button onclick="document.getElementById('intel-panel').classList.add('hidden')" class="text-slate-500 text-xs">CLOSE</button>
+                            </div>
+                            <div id="intel-type" class="text-[10px] font-bold tracking-widest text-slate-400 mb-2 uppercase">REGULAR RULE</div>
+                            <p id="intel-reminders" class="text-xs text-slate-300 leading-relaxed italic"></p>
+                        </div>
+
+                        <textarea id="fan-body" class="w-full h-72 bg-slate-950 p-4 rounded-2xl border border-slate-800 text-white outline-none focus:border-pink-500 font-medium leading-relaxed" placeholder="Write your celebrity message here..."></textarea>
+                        
+                        <div class="mt-4 flex gap-4">
+                            <button onclick="sendMail()" class="flex-1 bg-gradient-to-r from-blue-600 to-purple-800 py-4 rounded-2xl font-black tracking-widest hover:brightness-125 transition-all shadow-xl">SEND MESSAGE</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Bank: Pretérito -->
+                <div class="lg:col-span-1 space-y-4">
+                    <h3 class="font-bungee text-pink-400 text-sm text-center">Pretérito Bank<br><span class="text-[10px] text-slate-500 tracking-normal">(Suddenly...)</span></h3>
+                    <div class="grid grid-cols-1 gap-2">
+                        <button onclick="getVerbIntel('pret', 'Decir', 'Irregular', 'Stem change: DIJ-')" class="bank-item bg-pink-900/30 border border-pink-500/30 p-3 rounded-xl text-xs font-bold text-pink-200 text-left">Decir</button>
+                        <button onclick="getVerbIntel('pret', 'Poner', 'Irregular', 'Stem change: PUS-')" class="bank-item bg-pink-900/30 border border-pink-500/30 p-3 rounded-xl text-xs font-bold text-pink-200 text-left">Poner</button>
+                        <button onclick="getVerbIntel('pret', 'Hacer', 'Irregular', 'Stem change: HIC- (HIZ for él/ella)')" class="bank-item bg-pink-900/30 border border-pink-500/30 p-3 rounded-xl text-xs font-bold text-pink-200 text-left">Hacer</button>
+                        <button onclick="getVerbIntel('pret', 'Llegar', 'Spell-Change', 'Regular except in Yo form: -GUE')" class="bank-item bg-pink-900/30 border border-pink-500/30 p-3 rounded-xl text-xs font-bold text-pink-200 text-left">Llegar</button>
+                        <button onclick="getVerbIntel('pret', 'Comprar', 'Regular', '')" class="bank-item bg-pink-900/30 border border-pink-500/30 p-3 rounded-xl text-xs font-bold text-pink-200 text-left">Comprar</button>
+                        <button onclick="getVerbIntel('pret', 'Ver', 'Regularish', 'Regular endings, but NO accents.')" class="bank-item bg-pink-900/30 border border-pink-500/30 p-3 rounded-xl text-xs font-bold text-pink-200 text-left">Ver</button>
+                        <button onclick="getVerbIntel('pret', 'Tener', 'Irregular', 'Stem change: TUV-')" class="bank-item bg-pink-900/30 border border-pink-500/30 p-3 rounded-xl text-xs font-bold text-pink-200 text-left">Tener</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[100] p-4">
+        <div class="glass max-w-sm w-full p-8 rounded-[2rem] text-center border-2 border-yellow-400">
+            <div class="text-5xl mb-4">🚀</div>
+            <h3 class="font-bungee text-2xl mb-2">MESSAGE SENT</h3>
+            <p class="text-slate-400 text-sm mb-6">Your message was sent to the star's inbox.</p>
+            <button onclick="closeModal()" class="w-full bg-yellow-400 text-black font-black py-4 rounded-xl uppercase">Success</button>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById('tab-' + tab).classList.remove('hidden');
+            document.querySelectorAll('nav button').forEach(el => el.classList.remove('tab-active'));
+            document.getElementById('btn-' + tab).classList.add('tab-active');
+        }
+
+        const scandals = [
+            { celeb: "Rosalía", imp: "estaba", rest1: "en un café cuando", pret: "vio", rest2: "a Harry Styles." },
+            { celeb: "Bad Bunny", imp: "grababa", rest1: "un TikTok cuando", pret: "perdió", rest2: "su teléfono." },
+            { celeb: "Messi", imp: "entrenaba", rest1: "cuando un fan", pret: "corrió", rest2: "hacia él." }
+        ];
+
+        let selectedVerb = null;
+        function generateDrama() {
+            const current = scandals[Math.floor(Math.random() * scandals.length)];
+            const container = document.getElementById('sentence-container');
+            document.getElementById('feedback-box').classList.add('hidden');
+            document.getElementById('instruction-text').innerText = "Identify the verbs...";
+            document.getElementById('controls').classList.add('hidden');
+            container.innerHTML = `<span class="text-slate-400">${current.celeb} </span><button id="verb-imp" onclick="selectVerb('imp')" class="verb-btn px-2 rounded mx-1">${current.imp}</button><span class="text-slate-400"> ${current.rest1} </span><button id="verb-pret" onclick="selectVerb('pret')" class="verb-btn px-2 rounded mx-1">${current.pret}</button><span class="text-slate-400"> ${current.rest2}</span>`;
+        }
+
+        function selectVerb(type) {
+            selectedVerb = type;
+            document.getElementById('controls').classList.remove('hidden');
+            document.querySelectorAll('.verb-btn').forEach(b => b.classList.remove('ring-4', 'ring-yellow-400'));
+            document.getElementById('verb-' + type).classList.add('ring-4', 'ring-yellow-400');
+        }
+
+        function checkType(guessedType) {
+            const fb = document.getElementById('feedback-box');
+            fb.classList.remove('hidden', 'text-green-400', 'text-red-400');
+            if (guessedType === selectedVerb) {
+                fb.innerText = "¡Correcto!"; fb.classList.add('text-green-400');
+                document.getElementById('verb-' + selectedVerb).classList.add(selectedVerb === 'imp' ? 'correct-imp' : 'correct-pret');
+            } else {
+                fb.innerText = "Error. Check the timeline!"; fb.classList.add('text-red-400');
+            }
+        }
+
+        function postRumor() {
+            const feed = document.getElementById('rumor-feed');
+            const post = document.createElement('div');
+            post.className = "glass p-6 rounded-3xl border border-slate-800 new-post mb-6";
+            post.innerHTML = `<p class="text-xl font-bold">${document.getElementById('sel-celeb').value} <span class="text-blue-400">${document.getElementById('sel-imp').value}</span> cuando de repente <span class="text-pink-500">${document.getElementById('sel-pret').value}</span>.</p>`;
+            feed.prepend(post);
+        }
+
+        function getVerbIntel(tense, verb, type, stems) {
+            const panel = document.getElementById('intel-panel');
+            const vTitle = document.getElementById('intel-verb');
+            const vType = document.getElementById('intel-type');
+            const vNotes = document.getElementById('intel-reminders');
+
+            panel.classList.remove('hidden');
+            vTitle.innerText = verb;
+            vType.innerText = `${tense === 'imp' ? 'Imperfecto' : 'Pretérito'} • ${type}`;
+            
+            if (type === 'Regular') {
+                vNotes.innerText = `This verb follows the standard -${verb.slice(-2)} rules. Chop the ending and add the regular ${tense === 'imp' ? 'imperfect' : 'preterite'} suffix!`;
+                vType.className = "text-[10px] font-bold tracking-widest text-green-400 mb-2 uppercase";
+            } else {
+                vNotes.innerText = `Watch out! ${stems} Don't forget to apply the correct endings for ${tense === 'imp' ? 'imperfect' : 'preterite'}.`;
+                vType.className = "text-[10px] font-bold tracking-widest text-pink-400 mb-2 uppercase";
+            }
+        }
+
+        function sendMail() {
+            if (document.getElementById('fan-body').value.trim().length < 5) return;
+            document.getElementById('modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+            document.getElementById('fan-body').value = '';
+            document.getElementById('intel-panel').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
