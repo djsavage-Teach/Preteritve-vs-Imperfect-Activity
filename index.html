@@ -16,7 +16,7 @@
         .verb-btn { transition: all 0.2s ease; cursor: pointer; border-bottom: 3px solid rgba(255,255,255,0.2); }
         .verb-btn:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
         .correct-imp { background: #3b82f6 !important; color: white !important; border-color: #2563eb !important; box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
-        .correct-pret { background: #ec4899 !important; color: white !important; border-color: #db2777 !important; box-shadow: 0 0 15px rgba(236, 72, 153, 0.5); }
+        .correct-pret { background: #ec4899 !important; color: white !important; border-color: #db27776 !important; box-shadow: 0 0 15px rgba(236, 72, 153, 0.5); }
         
         .bank-item { transition: all 0.2s; cursor: pointer; position: relative; }
         .bank-item:hover { transform: scale(1.02); filter: brightness(1.2); }
@@ -100,32 +100,38 @@
                         <option value="Peso Pluma">Peso Pluma</option>
                         <option value="Selena Gomez">Selena Gomez</option>
                         <option value="Rauw Alejandro">Rauw Alejandro</option>
+                        <option value="Taylor Swift">Taylor Swift</option>
+                        <option value="Cristiano Ronaldo">Cristiano Ronaldo</option>
                     </select>
                 </div>
                 <div class="space-y-2">
                     <label class="text-xs font-bold text-slate-500 uppercase">2. Background (Imp)</label>
                     <select id="sel-imp" class="w-full bg-slate-900 p-3 rounded-xl border border-slate-700 text-blue-400 font-bold outline-none focus:border-blue-500">
-                        <option value="caminaba">caminaba</option>
-                        <option value="comía">comía</option>
-                        <option value="bailaba">bailaba</option>
-                        <option value="dormía">dormía</option>
-                        <option value="cantaba">cantaba</option>
-                        <option value="lloraba">lloraba</option>
-                        <option value="hacía ejercicio">hacía ejercicio</option>
-                        <option value="miraba el cielo">miraba el cielo</option>
+                        <option value="estaba|en la alfombra roja">estaba (was in the red carpet)</option>
+                        <option value="tenía|una cita secreta">tenía (was having a secret date)</option>
+                        <option value="hacía|un video en vivo">hacía (was making a live video)</option>
+                        <option value="iba|a los Grammys">iba (was going to the Grammys)</option>
+                        <option value="veía|fotos de su ex">veía (was looking at photos of their ex)</option>
+                        <option value="quería|comprar una mansión">quería (wanted to buy a mansion)</option>
+                        <option value="sabía|la verdad">sabía (knew the truth)</option>
+                        <option value="ponía|música nueva">ponía (was playing new music)</option>
+                        <option value="decía|mentiras">decía (was telling lies)</option>
+                        <option value="venía|de una fiesta">venía (was coming from a party)</option>
                     </select>
                 </div>
                 <div class="space-y-2">
                     <label class="text-xs font-bold text-slate-500 uppercase">3. Interruption (Pret)</label>
                     <select id="sel-pret" class="w-full bg-slate-900 p-3 rounded-xl border border-slate-700 text-pink-500 font-bold outline-none focus:border-pink-500">
-                        <option value="se cayó">se cayó</option>
-                        <option value="gritó">gritó</option>
-                        <option value="vio un fantasma">vio un fantasma</option>
-                        <option value="perdió su diamante">perdió su diamante</option>
-                        <option value="encontró un tesoro">encontró un tesoro</option>
-                        <option value="rompió su teléfono">rompió su teléfono</option>
-                        <option value="recibió un mensaje">recibió un mensaje</option>
-                        <option value="estornudó">estornudó</option>
+                        <option value="llegó|un paparazzi">llegó (a paparazzi arrived)</option>
+                        <option value="salió|corriendo del lugar">salió (left running from the place)</option>
+                        <option value="miró|a la cámara">miró (looked at the camera)</option>
+                        <option value="llamó|a la policía">llamó (called the police)</option>
+                        <option value="pasó|algo increíble">pasó (something incredible happened)</option>
+                        <option value="encontró|un anillo de diamante">encontró (found a diamond ring)</option>
+                        <option value="tomó|un avión privado">tomó (took a private plane)</option>
+                        <option value="habló|con la prensa">habló (spoke with the press)</option>
+                        <option value="quedó|en shock">quedó (was in shock)</option>
+                        <option value="empezó|a llorar">empezó (started to cry)</option>
                     </select>
                 </div>
                 <button onclick="postRumor()" class="bg-white text-black font-black py-3 rounded-xl hover:bg-yellow-400 transition-all">POST RUMOR</button>
@@ -223,7 +229,7 @@
             document.getElementById('feedback-box').classList.add('hidden');
             document.getElementById('instruction-text').innerText = "Identify the verbs...";
             document.getElementById('controls').classList.add('hidden');
-            container.innerHTML = `<span class="text-slate-400">${current.celeb} </span><button id="verb-imp" onclick="selectVerb('imp')" class="verb-btn px-2 rounded mx-1">${current.imp}</button><span class="text-slate-400"> ${current.rest1} </span><button id="verb-pret" onclick="selectVerb('pret')" class="verb-btn px-2 rounded mx-1">${current.pret}</button><span class="text-slate-400"> ${current.rest2}</span>`;
+            container.innerHTML = `<span class="text-slate-400">${current.celeb} </span><button id="verb-imp" onclick="selectVerb('imp')" class="verb-btn px-2 rounded mx-1">${current.imp}</button><span class="text-slate-400"> ${current.rest1} </span><button id="verb-pret" onclick="selectVerb('pret')" class="selectVerb('pret')" class="verb-btn px-2 rounded mx-1">${current.pret}</button><span class="text-slate-400"> ${current.rest2}</span>`;
         }
 
         function selectVerb(type) {
@@ -246,9 +252,46 @@
 
         function postRumor() {
             const feed = document.getElementById('rumor-feed');
+            const celebName = document.getElementById('sel-celeb').value;
+            
+            // Extract verb and its detail
+            const impParts = document.getElementById('sel-imp').value.split('|');
+            const impVerb = impParts[0];
+            const impDetail = impParts[1];
+            
+            const pretParts = document.getElementById('sel-pret').value.split('|');
+            const pretVerb = pretParts[0];
+            const pretDetail = pretParts[1];
+            
             const post = document.createElement('div');
             post.className = "glass p-6 rounded-3xl border border-slate-800 new-post mb-6";
-            post.innerHTML = `<p class="text-xl font-bold">${document.getElementById('sel-celeb').value} <span class="text-blue-400">${document.getElementById('sel-imp').value}</span> cuando de repente <span class="text-pink-500">${document.getElementById('sel-pret').value}</span>.</p>`;
+            
+            post.innerHTML = `
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-tr from-yellow-400 to-pink-500 rounded-full flex items-center justify-center font-black text-black">
+                        ${celebName.charAt(0)}
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-white leading-none">${celebName} <span class="text-blue-400 text-xs ml-1"><i class="fa-solid fa-circle-check"></i></span></h4>
+                        <span class="text-[10px] text-slate-500 uppercase tracking-tighter">Just now • Hollywood, CA</span>
+                    </div>
+                    <button class="ml-auto text-slate-600 hover:text-white"><i class="fa-solid fa-ellipsis"></i></button>
+                </div>
+                
+                <p class="text-lg md:text-xl font-medium leading-relaxed mb-6">
+                    🚨 BREAKING: Se rumorea que ${celebName} <span class="text-blue-400 font-bold underline decoration-2 underline-offset-4">${impVerb}</span> ${impDetail} cuando de repente <span class="text-pink-500 font-bold underline decoration-2 underline-offset-4">${pretVerb}</span> ${pretDetail}. ¡Qué escándalo!
+                </p>
+                
+                <div class="flex items-center justify-between pt-4 border-t border-slate-800 text-slate-400">
+                    <div class="flex gap-6">
+                        <button class="hover:text-pink-500 transition-colors flex items-center gap-2 text-sm"><i class="fa-regular fa-heart"></i> ${Math.floor(Math.random() * 500) + 1}k</button>
+                        <button class="hover:text-blue-400 transition-colors flex items-center gap-2 text-sm"><i class="fa-regular fa-comment"></i> ${Math.floor(Math.random() * 100) + 1}k</button>
+                        <button class="hover:text-green-400 transition-colors flex items-center gap-2 text-sm"><i class="fa-solid fa-retweet"></i> Share</button>
+                    </div>
+                    <button class="hover:text-yellow-400"><i class="fa-regular fa-bookmark"></i></button>
+                </div>
+            `;
+            
             feed.prepend(post);
         }
 
